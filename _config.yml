@@ -111,11 +111,14 @@ theme_config:
     grayout: false
   favicon:
     desktop:
-      gravatar: true
+      gravatar: false
+      url: /logo/logo.png
     android:
-      gravatar: true
+      gravatar: false
+      url: /logo/logo.png
     apple:
-      gravatar: true
+      gravatar: false
+      url: /logo/logo.png
   # show_category_section: false
   # show_tags_section: false
   projects_url: https://github.com/ZiugatWong
