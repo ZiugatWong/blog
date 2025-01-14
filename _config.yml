@@ -40,7 +40,10 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
+marked:
+  prependRoot: true
+  postAsset: true
 relative_link: false
 future: true
 syntax_highlighter: highlight.js
@@ -120,6 +123,9 @@ theme_config:
     -
       icon: github
       link: https://github.com/ZiugatWong
+  copyright:
+    start_year: 2025
+    end_year:
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
