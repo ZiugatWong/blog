@@ -16,7 +16,7 @@ tags:
 
 ## 1 初见 Hexo
 
-工作多年以来，最近这段时间突然萌生了搭建自己博客的想法。不论是自由表达想法，记录下折腾过程，或是功利性的给别人留下好影响，都让我觉得`It's time to do!`。
+工作多年以来，最近这段时间突然萌生了搭建自己博客的想法。不论是随心所欲表达想法，记录某些折腾过程，或是让别人快速了解我的过去，都让我觉得`It's time to do!`。
 
 在之前的公司我曾用`MkDocs`从零搭建过团队的项目文档平台，但看了下网上大家的讨论，觉得用来做个人博客还是有点不给力，于是采用了最常见的 Hexo + GitHub Pages 方案。
 
@@ -86,7 +86,7 @@ Hexo 直接在`_config.yml`中提供了`post_asset_folder`配置，改为 true �
 
 ## 7 支持留言板
 
-这里选择开源免费的`utterances`，它是基于 GitHub issues 构建的留言组件。按如下步骤配置即可：
+这里我选择开源免费的`utterances`，它是基于 GitHub issues 构建的留言组件。按如下步骤配置即可：
 
 1. 安装官方提供的 [GitHub App](https://github.com/apps/utterances) ，安装成功后配置一个 GitHub repo 作为留言 issues 关联的仓库。
 1. 去官方页面 [https://utteranc.es/](https://utteranc.es/) 生成自己需要的配置。

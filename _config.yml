@@ -122,6 +122,11 @@ theme_config:
   # show_category_section: false
   # show_tags_section: false
   projects_url: https://github.com/ZiugatWong
+  nav:
+    home: /
+    about: /about/
+    articles: /archives/
+    projects: https://github.com/ZiugatWong
   social_links:
     -
       icon: github
