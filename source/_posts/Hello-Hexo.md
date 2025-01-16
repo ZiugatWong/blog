@@ -61,7 +61,7 @@ zlib: 1.2.13
 
 既然使用了 Hexo，那肯定少不了挑一个合适主题美化自己的博客，在浏览[Hexo主题排行](https://www.hexothemes.com/popular/free/)时，我一眼看中了`Cactus`，这货的风格感觉很符合`Unix`的`keep it simple, stupid`哲学。
 
-我直接`git clone`到博客的`themes`目录下，并修改`_config.xml`中`theme: cactus`。然后，Hexo！启动！一切正常。但发现`tags`和`categories`在此主题下显示不了，遂去官方仓库上翻 Issues，正好看到了有人[新增了相关特性](https://github.com/probberechts/hexo-theme-cactus/issues/321)，但 PR 还没被接收，没办法只能先`git clone https://github.com/nkapila6/hexo-theme-cactus.git`（此处有个问题影响部署，若想一次成功，请直接看部署小节的问题修复），重新启动 Hexo，终于有`tags`和`categories`了。
+我直接`git clone`到博客的`themes`目录下，并修改`_config.xml`中`theme: cactus`。然后，Hexo！启动！一切正常。但发现`tags`和`categories`在此主题的首页显示不了，遂去官方仓库上翻 Issues，正好看到了有人[新增了相关特性](https://github.com/probberechts/hexo-theme-cactus/issues/321)，但 PR 还没被接收，没办法只能先`git clone https://github.com/nkapila6/hexo-theme-cactus.git`（此处有个问题影响部署，若想一次成功，请直接看部署小节的问题修复），重新启动 Hexo，终于有`tags`和`categories`了。
 
 ## 5 部署到 GitHub
 
@@ -74,7 +74,7 @@ zlib: 1.2.13
 1. Commit 并 push 到默认分支上。
 1. 部署完成后，前往 username.github.io/repository 查看网页。
 
-上述步骤操作完成后，查看仓库 GitHub Actions 的记录，发现报错如下
+上述步骤操作完成后，查看仓库 GitHub Actions 的记录，发现报错如下：
 
 ![Actions部署报错](Hello-Hexo/actions_error.png)
 
@@ -83,3 +83,13 @@ zlib: 1.2.13
 ## 6 引用图片
 
 Hexo 直接在`_config.yml`中提供了`post_asset_folder`配置，改为 true 后使用`hexo n xxx`会生产一个 xxx.md 文章文件和 xxx 的同名目录，目录用来存放文章引用到的图片。当使用`MarkDown`语法引用图片后，执行`hexo s`是无法展示的，需要使用额外的插件修正，我使用了`hexo-asset-img`这个插件（`hexo-asset-image`已经过时了），安装后重新部署，就可以看到图片正常展示。
+
+## 7 支持留言板
+
+这里选择开源免费的`utterances`，它是基于 GitHub issues 构建的留言组件。按如下步骤配置即可：
+
+1. 安装官方提供的 [GitHub App](https://github.com/apps/utterances) ，安装成功后配置一个 GitHub repo 作为留言 issues 关联的仓库。
+1. 去官方页面 [https://utteranc.es/](https://utteranc.es/) 生成自己需要的配置。
+1. 将配置项的值复制到自己的`_config.yml`中，主要是`utterances`下的`repo`、`issue_term`和`theme`这几项。
+
+安装完成后重新部署，就可以看到我们的文章最后，多了可用的留言板。

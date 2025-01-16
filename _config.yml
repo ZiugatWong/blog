@@ -129,6 +129,12 @@ theme_config:
   copyright:
     start_year: 2025
     end_year:
+  utterances:
+    enabled: true
+    repo: ZiugatWong/blog
+    issue_term: pathname
+    label: utteranc
+    theme: github-dark
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
