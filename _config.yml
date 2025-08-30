@@ -97,10 +97,22 @@ exclude:
 ignore:
 
 # Extensions
-## Plugins: https://hexo.io/plugins/
+## Plugins: https://hexo.io/plugins/mermaid:
+    enabled: true
 ## Themes: https://hexo.io/themes/
 theme: cactus
 theme_config:
+  mermaid:
+    enabled: true
+    version: 10.9.1
+    options:
+      startOnLoad: true
+      theme: base
+      themeVariables: 
+        # https://mermaid.js.org/config/theming.html
+        darkMode: true
+        primaryColor: transparent
+        noteBkgColor: transparent
   colorscheme: dark
   logo:
     enabled: true

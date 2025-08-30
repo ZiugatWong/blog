@@ -24,7 +24,7 @@ tags:
 
 ## 2 安装
 
-别的不多说，上来的第一步肯定是要浏览一下[官方文档](https://hexo.io/zh-cn/docs/)（文档居然有汉化，看来官方很注重`i18n`）。照着官方文档的安装步骤，在我这台老`Debian`本本上成功安装。
+别的不多说，上来的第一步肯定是要浏览一下[官方文档](https://hexo.io/zh-cn/docs/)（文档居然有汉化，看来官方很注重`i18n`）。照着官方文档的安装步骤，在我这台老 Debian 本本上成功安装。
 
 ```bash
 wzj@wzj-debian:~$ hexo -v
@@ -55,17 +55,53 @@ zlib: 1.2.13
 
 ## 3 学习基本概念
 
-接下来就是通读一下文档里[配置](https://hexo.io/zh-cn/docs/configuration)和[命令](https://hexo.io/zh-cn/docs/commands)，看完后感觉和`MkDocs`的差不多，看来文档平台的需求很成熟了。接下来照着文档启动本地Hexo，成功后又读了一遍文档里[基本操作](https://hexo.io/zh-cn/docs/writing)部分的内容，大概清楚了Hexo的写作要素和文章存放结构。
+接下来就是通读一下文档里[配置](https://hexo.io/zh-cn/docs/configuration)和[命令](https://hexo.io/zh-cn/docs/commands)，看完后感觉和 MkDocs 的差不多，看来文档平台的需求很成熟了。接下来照着文档启动本地 Hexo，成功后又读了一遍文档里[基本操作](https://hexo.io/zh-cn/docs/writing)部分的内容，大概清楚了 Hexo 的写作要素和文章存放结构。
 
 ## 4 使用主题
 
-既然使用了 Hexo，那肯定少不了挑一个合适主题美化自己的博客，在浏览[Hexo主题排行](https://www.hexothemes.com/popular/free/)时，我一眼看中了`Cactus`，这货的风格感觉很符合`Unix`的`keep it simple, stupid`哲学。
+既然使用了 Hexo，那肯定少不了挑一个合适主题美化自己的博客，在浏览[Hexo主题排行](https://www.hexothemes.com/popular/free/)时，我一眼看中了 Cactus，这货的风格感觉很符合 Unix 的`keep it simple, stupid`哲学。
 
-我直接`git clone`到博客的`themes`目录下，并修改`_config.xml`中`theme: cactus`。然后，Hexo！启动！一切正常。但发现`tags`和`categories`在此主题的首页显示不了，遂去官方仓库上翻 Issues，正好看到了有人[新增了相关特性](https://github.com/probberechts/hexo-theme-cactus/issues/321)，但 PR 还没被接收，没办法只能先`git clone https://github.com/nkapila6/hexo-theme-cactus.git`（此处有个问题影响部署，若想一次成功，请直接看部署小节的问题修复），重新启动 Hexo，终于有`tags`和`categories`了。
+我直接`git clone`到博客的 themes 目录下，并修改`_config.xml`中`theme: cactus`。然后，Hexo！启动！一切正常。但发现 tags 和 categories 在此主题的首页显示不了，遂去官方仓库上翻 Issues，正好看到了有人[新增了相关特性](https://github.com/probberechts/hexo-theme-cactus/issues/321)，但 PR 还没被接收，没办法只能先`git clone https://github.com/nkapila6/hexo-theme-cactus.git`（此处有个问题影响部署，若想一次成功，请直接看部署小节的问题修复），重新启动 Hexo，终于有 tags 和 categories 了。
 
-## 5 部署到 GitHub
+## 5 支持 Mermaid
 
-参考[官方文档部署过程](https://hexo.io/zh-cn/docs/github-pages)提供的如下步骤，推送到自己的`repo`：
+之前我在自己的文档里画图都是用的 Mermaid，所以在博客里也希望能继续使用，看了下 Hexo 官方建议，只能通过`hexo-filter-mermaid-diagrams`插件来实现。使用这个插件需要在`theme`里配置修改部分文件，考虑后决定自己 fork 一份`hexo-theme-cactus`仓库来修改，这样别人也能直接使用。
+
+`_config.yml`文件增加如下部分：
+```yml
+# please modify options with https://mermaid.js.org/config/schema-docs/config.html
+mermaid:
+  enabled: true
+  version: 10.9.1
+  options:
+    startOnLoad: true
+    theme: default
+```
+
+`layout/_partial/scripts.ejs`文件增加如下部分：
+```js
+<!-- Mermaid chart -->
+<% if (theme.mermaid.enabled) { %>
+<script src='https://unpkg.com/mermaid@<%- theme.mermaid.version %>/dist/mermaid.min.js'></script>
+<% var options = theme.mermaid.options; %>
+<script>
+    if (window.mermaid) {
+        mermaid.initialize(<%- JSON.stringify(options) %>);
+    }
+</script>
+<% } %>
+```
+
+安装完`hexo-filter-mermaid-diagrams`插件再重新部署，就可展示下面这种 Mermaid 图表了。
+
+```mermaid
+flowchart LR
+  A -->|发送消息| B
+```
+
+## 6 部署到 GitHub
+
+参考[官方文档部署过程](https://hexo.io/zh-cn/docs/github-pages)提供的如下步骤，推送到自己的 repo ：
 
 1. 在博客项目中建立`.github/workflows/pages.yml`文件，填写内容直接负责官方提供的即可
 1. 导航到 GitHub 上的存储库。 转到 Settings 选项卡。 建立名为 <repository 的名字> 的储存库，这样你的博客网址为 <你的 GitHub 用户名>.github.io/<repository 的名字>，repository 的名字可以任意，例如 blog 或 hexo。
@@ -80,16 +116,16 @@ zlib: 1.2.13
 
 错误信息说找不到`cactus`子模块，原来是本地仓库没有`.gitmodules`配置文件，这个是因为我直接用`git clone`拉取了主题，对博客项目来说，主题应该作为子模块存在才对。于是我清理完旧主题目录后，重新用`git submodule add https://github.com/nkapila6/hexo-theme-cactus.git themes/cactus`拉取了主题，此时项目多了`.gitmodules`配置文件，重新 commit & push 后就看到 GitHub 上部署成功了。
 
-## 6 引用图片
+## 7 引用图片
 
-Hexo 直接在`_config.yml`中提供了`post_asset_folder`配置，改为 true 后使用`hexo n xxx`会生产一个 xxx.md 文章文件和 xxx 的同名目录，目录用来存放文章引用到的图片。当使用`MarkDown`语法引用图片后，执行`hexo s`是无法展示的，需要使用额外的插件修正，我使用了`hexo-asset-img`这个插件（`hexo-asset-image`已经过时了），安装后重新部署，就可以看到图片正常展示。
+Hexo 直接在`_config.yml`中提供了`post_asset_folder`配置，改为 true 后使用`hexo n xxx`会生产一个 xxx.md 文章文件和 xxx 的同名目录，目录用来存放文章引用到的图片。当使用 MarkDown 语法引用图片后，执行`hexo s`是无法展示的，需要使用额外的插件修正，我使用了`hexo-asset-img`这个插件（`hexo-asset-image`已经过时了），安装后重新部署，就可以看到图片正常展示。
 
-## 7 支持留言板
+## 8 支持留言板
 
-这里我选择开源免费的`utterances`，它是基于 GitHub issues 构建的留言组件。按如下步骤配置即可：
+这里我选择开源免费的 utterances，它是基于 GitHub issues 构建的留言组件。按如下步骤配置即可：
 
 1. 安装官方提供的 [GitHub App](https://github.com/apps/utterances) ，安装成功后配置一个 GitHub repo 作为留言 issues 关联的仓库。
 1. 去官方页面 [https://utteranc.es/](https://utteranc.es/) 生成自己需要的配置。
-1. 将配置项的值复制到自己的`_config.yml`中，主要是`utterances`下的`repo`、`issue_term`和`theme`这几项。
+1. 将配置项的值复制到自己的`_config.yml`中，主要是 utterances 下的`repo`、`issue_term`和`theme`这几项。
 
 安装完成后重新部署，就可以看到我们的文章最后，多了可用的留言板。
