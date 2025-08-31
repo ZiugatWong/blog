@@ -61,7 +61,7 @@ zlib: 1.2.13
 
 既然使用了 Hexo，那肯定少不了挑一个合适主题美化自己的博客，在浏览[Hexo主题排行](https://www.hexothemes.com/popular/free/)时，我一眼看中了 Cactus，这货的风格感觉很符合 Unix 的`keep it simple, stupid`哲学。
 
-我直接`git clone`到博客的 themes 目录下，并修改`_config.xml`中`theme: cactus`。然后，Hexo！启动！一切正常。但发现 tags 和 categories 在此主题的首页显示不了，遂去官方仓库上翻 Issues，正好看到了有人[新增了相关特性](https://github.com/probberechts/hexo-theme-cactus/issues/321)，但 PR 还没被接收，没办法只能先`git clone https://github.com/nkapila6/hexo-theme-cactus.git`（此处有个问题影响部署，若想一次成功，请直接看部署小节的问题修复），重新启动 Hexo，终于有 tags 和 categories 了。
+我直接`git clone`到博客的 themes 目录下，并修改`_config.xml`中`theme:cactus`。然后，Hexo！启动！一切正常。但发现 tags 和 categories 在此主题的首页显示不了，遂去官方仓库上翻 Issues，正好看到了有人[新增了相关特性](https://github.com/probberechts/hexo-theme-cactus/issues/321)，但 PR 还没被接收，没办法只能先`git clone https://github.com/nkapila6/hexo-theme-cactus.git`（此处有个问题影响部署，若想一次成功，请直接看部署小节的问题修复），重新启动 Hexo，终于有 tags 和 categories 了。
 
 ## 5 支持 Mermaid
 

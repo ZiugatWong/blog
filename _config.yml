@@ -107,7 +107,7 @@ theme_config:
     version: 10.9.1
     options:
       startOnLoad: true
-      theme: default
+      theme: dark
       # themeVariables: 
       #   # https://mermaid.js.org/config/theming.html
       #   darkMode: true
