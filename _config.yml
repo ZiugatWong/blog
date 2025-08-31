@@ -107,12 +107,10 @@ theme_config:
     version: 10.9.1
     options:
       startOnLoad: true
-      theme: base
-      themeVariables: 
-        # https://mermaid.js.org/config/theming.html
-        darkMode: true
-        primaryColor: transparent
-        noteBkgColor: transparent
+      theme: default
+      # themeVariables: 
+      #   # https://mermaid.js.org/config/theming.html
+      #   darkMode: true
   colorscheme: dark
   logo:
     enabled: true
