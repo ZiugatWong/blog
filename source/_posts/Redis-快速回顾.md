@@ -819,13 +819,16 @@ typedef struct intset {
 block-beta
   classDef dottedBox stroke-dasharray: 5 5
   classDef redBox stroke:red
+
   columns 5
+
   block:11:2
     e1["encoding: INTSET_ENC_INT16"] l1["length:2"]
   end
   block:12:3
     x11["0x00"] x12["0x01"] x13["0x00"] x14["0x02"] space:8
   end
+
   block:21:2
     e2["encoding: INTSET_ENC_INT32"] l2["length:2"]
     class e2 redBox
@@ -834,6 +837,7 @@ block-beta
     x21["0x00"] x22["0x01"] x23["0x00"] x24["0x02"]
     s21[" "] s22[" "] s23[" "] s24[" "] s25[" "] s26[" "] s27[" "] s28[" "]
   end
+
   block:31:2
     e3["encoding: INTSET_ENC_INT32"] l3["length:2"]
   end
@@ -847,6 +851,7 @@ block-beta
     class s33 redBox
     class s34 redBox
   end
+
   block:41:2
     e4["encoding: INTSET_ENC_INT32"] l4["length:2"]
   end
@@ -858,6 +863,7 @@ block-beta
     class x43 redBox
     class x44 redBox
   end
+
   block:51:2
     e5["encoding: INTSET_ENC_INT32"] l5["length:2"]
   end
@@ -869,6 +875,7 @@ block-beta
     class s57 redBox
     class s58 redBox
   end
+
   block:61:2
     e6["encoding: INTSET_ENC_INT32"] l6["length:3"]
     class l6 redBox
@@ -909,6 +916,88 @@ typedef struct dictEntry {
     } v; // 值
     struct dictEntry *next; // 下一个Entry的指针
 } dictEntry;
+```
+- 内存结构
+
+```mermaid
+block-beta
+  classDef title fill:None,stroke:None
+
+  columns 7
+
+  block:c1:1
+    columns 1
+    block:d:1
+      columns 1
+      dict["dict"] type["*type"] privdata["*privdata"] dht["dictht ht[2]"] r["rehashidx: -1"] p["pauserehash: 0"]
+      class dict title
+    end
+    space:2
+  end
+  class c1 title
+
+  space
+
+  block:c2:1
+    columns 1
+    block:ht1:1
+      columns 1
+      dictht1["dictht"] eArray1["dictEntry **table"] s1["size:4"] sm1["sizemask:3"] u1["used:2"]
+      class dictht1 title
+    end
+    space
+    block:ht2:1
+      columns 1
+      dictht2["dictht"] eArray2["dictEntry **table"] s2["size:0"] sm2["sizemask:0"] u2["used:0"]
+    end
+  end
+  class c2 title
+  class dictht2 title
+
+  space
+
+  block:c3:1
+    columns 1
+    block:eArray:1
+      columns 1
+      dictentry["dictEntry*[4]"] i0["0"] i1["1"] i2["2"] i3["3"]
+    end
+    space:2
+  end
+  class c3 title
+  class dictentry title
+
+  space
+
+  block:c4:1
+    columns 1
+    block:e1:1
+      columns 1
+      dictEntry1["dictEntry"] key1["key:k1"] val1["val:v1"] next1["*next"]
+    end
+    space
+    block:e2:1
+      columns 1
+      dictEntry2["dictEntry"] key2["key:k2"] val2["val:v2"] next2["*next"]
+    end
+    space
+  end
+  class c4 title
+  class dictEntry1 title
+  class dictEntry2 title  
+
+  dht-- "ht[0]" -->ht1
+  dht-- "ht[1]" -->ht2
+  eArray1-->eArray
+  i1-->e1
+  next1-->e2
+```
+
+- hash 索引的计算
+
+```c
+hash = dict->type->hashFunction(key); // 使用字典设置的哈希函数，计算键key的哈希值
+index = hash & dict->ht[x].sizemask; // 再用哈希表的sizemask属性和第一步得到的哈希值求与得到索引值
 ```
 
 
