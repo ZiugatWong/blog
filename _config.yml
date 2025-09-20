@@ -102,6 +102,8 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: cactus
 theme_config:
+  mathjax:
+    enabled: true
   mermaid:
     enabled: true
     version: 11.10.1

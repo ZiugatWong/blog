@@ -894,8 +894,8 @@ block-beta
 typedef struct dict {
     dictType *type; // dict类型，内置不同的hash函数
     void *privdata;     // 私有数据，在做特殊hash运算时用
-    dictht ht[2]; // 一个Dict包含两个哈希表，其中一个是当前数据，另一个一般是空，rehash时使用
-    long rehashidx;   // rehash的进度，-1表示未进行
+    dictht ht[2]; // 一个Dict包含两个哈希表，其中ht[0]是当前数据，ht[1]在rehash过程中才使用
+    long rehashidx;   // 当前待rehash的entry表索引，-1表示未进行，每次rehash一个索引后+1
     int16_t pauserehash; // rehash是否暂停，1则暂停，0则继续
 } dict;
 
@@ -917,6 +917,7 @@ typedef struct dictEntry {
     struct dictEntry *next; // 下一个Entry的指针
 } dictEntry;
 ```
+
 - 内存结构
 
 ```mermaid
@@ -1000,6 +1001,25 @@ hash = dict->type->hashFunction(key); // 使用字典设置的哈希函数，计
 index = hash & dict->ht[x].sizemask; // 再用哈希表的sizemask属性和第一步得到的哈希值求与得到索引值
 ```
 
+- 根据使用情况优化内存
+  - 扩容：在每次新增键值对时都会检查负载因子（ LoadFactor = used / size ），满足以下两种情况时会触发哈希表扩容：
+    - 哈希表的 LoadFactor >= 1，并且服务器没有执行 BGSAVE 或者 BGREWRITEAOF 等后台进程；
+    - 哈希表的 LoadFactor > 5 ；
+  - 收缩：每次删除元素时，对负载因子做检查，当 LoadFactor < 0.1 时，会做哈希表收缩
+
+- rehash：无论扩容还是收缩，哈希的 size 和 sizemask 都会变化，旧 key 需要重新哈希到新的正确位置，但是数据量巨大时，一次性哈希所有的旧 key 会导致 dict 较长时间不可用，所以 Redis 采用了**渐进式** rehash 的方式来操作：
+  1. 计算新 hash 表的 size：
+     - 扩容：size = 第一个大于等于 dict.ht[0].used + 1 的 $2^n$ 值
+     - 缩容：size = 第一个大于等于 dict.ht[0].used 的 $2^n$ 值（最少为 4）
+  2. 用新的 size 申请空间给新创建的 dictht，再把新创建的 dictht 赋值给 dict.ht[1]
+  3. dict.rehashidx = 0，表示开始 rehash
+  4. 每次执行新增、查询、修改、删除操作时，都检查一下 dict.rehashidx 是否大于 -1，如果是则将 dict.ht[0].table[rehashidx] 的 entry 链表 rehash 到dict.ht[1]，并且将 rehashidx++。直至 dict.ht[0] 的所有数据都 rehash 到 dict.ht[1]
+  5. 将 dict.ht[1] 赋值给 dict.ht[0]，给 dict.ht[1] 初始化为空哈希表，释放原来的 dict.ht[0] 的内存
+  6. dict.rehashidx = -1，表示结束 rehash
+  7. 在rehash过程中
+     - 若有新增操作，则直接写入 dict.ht[1]
+     - 若有查询、修改和删除，则会在 dict.ht[0] 和 dict.ht[1] 依次查找并执行
+     - 这样可以确保 dict.ht[0] 的数据只减不增，随着 rehash 的进行慢慢变空
 
 ### ZipList
 
