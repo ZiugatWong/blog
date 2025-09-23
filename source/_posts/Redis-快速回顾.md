@@ -127,7 +127,7 @@ PFCOUNT h1 # 判断h1中元素个数
 PFMERGE h h1 h2 # 合并h1和h2到h
 ```
 
-## Java客户端
+## Java 客户端
 
 ### Jedis
 
@@ -165,7 +165,7 @@ RedisTemplate 的两种序列化实践方案如下：
 2. 方案二
 	- 使用 StringRedisTemplate
 	- 写入 Redis 时，手动把对象序列化为 JSON
-	- 读取 Redis时，手动把读取到的 JSON 反序列化为对象
+	- 读取 Redis 时，手动把读取到的 JSON 反序列化为对象
 
 ## 缓存一致性
 
@@ -416,7 +416,7 @@ Redisson 分布式锁原理：
 
 ### RDB
 
-RDB 全称 Redis Database Backup file（Redis数据备份文件），也被叫做 Redis 数据快照。简单来说就是把内存中的所有数据都记录到磁盘中。当Redis实例故障重启后，从磁盘读取快照文件，恢复数据。
+RDB 全称 Redis Database Backup file（Redis数据备份文件），也被叫做 Redis 数据快照。简单来说就是把内存中的所有数据都记录到磁盘中。当 Redis 实例故障重启后，从磁盘读取快照文件，恢复数据。
 
 快照文件称为 RDB 文件，默认是保存在当前运行目录。Redis 停机时会执行一次 RDB。
 
@@ -449,7 +449,7 @@ flowchart LR
 |  文件大小   |       会有压缩，文件体积小       |           记录命令，文件体积很大            |
 | 宕机恢复速度  |           很快           |                慢                 |
 | 数据恢复优先级 |     低，因为数据完整性不如 AOF     |           高，因为数据完整性更高            |
-| 系统资源占用  |      高，大量 CPU 和内存消耗      | 低，主要是磁盘 IO 资源 但AOF重写时会占用大量 CPU 和内存资源 |
+| 系统资源占用  |      高，大量 CPU 和内存消耗      | 低，主要是磁盘 IO 资源 但 AOF 重写时会占用大量 CPU 和内存资源 |
 |  使用场景   | 可以容忍数分钟的数据丢失，追求更快的启动速度 |           对数据安全性要求较高常见           |
 
 ## 集群模式
@@ -558,7 +558,7 @@ flowchart TB
 
 散列插槽
 
-- Redis 会把每一个 maste r节点映射到 0~16383 共 16384 个插槽（hash slot）上
+- Redis 会把每一个 maste r节点映射到 0 ~ 16383 共 16384 个插槽（hash slot）上
 - 数据 key 不是与节点绑定，而是与插槽绑定。redis 会根据 key 的有效部分计算插槽值，分两种情况：
   - key 中包含"{}"，且“{}”中至少包含 1 个字符，“{}”中的部分是有效部分
   - key 中不包含“{}”，整个 key 都是有效部分
@@ -1016,12 +1016,115 @@ index = hash & dict->ht[x].sizemask; // 再用哈希表的sizemask属性和第�
   4. 每次执行新增、查询、修改、删除操作时，都检查一下 dict.rehashidx 是否大于 -1，如果是则将 dict.ht[0].table[rehashidx] 的 entry 链表 rehash 到dict.ht[1]，并且将 rehashidx++。直至 dict.ht[0] 的所有数据都 rehash 到 dict.ht[1]
   5. 将 dict.ht[1] 赋值给 dict.ht[0]，给 dict.ht[1] 初始化为空哈希表，释放原来的 dict.ht[0] 的内存
   6. dict.rehashidx = -1，表示结束 rehash
-  7. 在rehash过程中
+  7. 在 rehash 过程中
      - 若有新增操作，则直接写入 dict.ht[1]
      - 若有查询、修改和删除，则会在 dict.ht[0] 和 dict.ht[1] 依次查找并执行
      - 这样可以确保 dict.ht[0] 的数据只减不增，随着 rehash 的进行慢慢变空
 
 ### ZipList
+
+Redis 源码中这样说明 ziplist：
+
+> The ziplist is a specially encoded dually linked list that is designed
+> to be very memory efficient. It stores both strings and integer values,
+> where integers are encoded as actual integers instead of a series of
+> characters. It allows push and pop operations on either side of the list
+> in O(1) time. However, because every operation requires a reallocation of
+> the memory used by the ziplist, the actual complexity is related to the
+> amount of memory used by the ziplist. 
+
+翻译如下：
+
+ziplist 是为了提高存储效率而设计的一种特殊编码的双向链表。它可以存储字符串或者整数，存储整数时是采用整数的二进制而不是字符串形式存储。它能在 O(1) 的时间复杂度下完成 list 两端的 push 和 pop 操作。但是因为每次操作都需要重新分配 ziplist 的内存，所以实际复杂度和 ziplist 的内存使用量相关。
+
+- ziplist 的结构
+
+```txt
+<zlbytes> <zltail> <zllen> <entry> <entry> ... <entry> <zlend>
+    |        |        |                                   |
+ 4 bytes  4 bytes  2 bytes                              1 byte
+```
+
+| 属性      | 类型       | 字节长度 | 用途                                                                                   |
+|---------|----------|------|--------------------------------------------------------------------------------------|
+| zlbytes | uint32_t | 4    | 记录整个压缩列表占用的内存字节数                                                                     |
+| zltail  | uint32_t | 4    | 记录压缩列表表尾节点距离压缩列表的起始地址有多少字节，通过这个偏移量，可以确定表尾节点的地址                                      |
+| zllen   | uint16_t | 2    | 记录了压缩列表包含的节点数量。最大值为 UINT16_MAX （65534），如果超过这个值，此处会记录为 65535，但节点的真实数量需要遍历整个压缩列表才能计算得出 |
+| entry   | 列表节点     | 不定   | 压缩列表包含的各个节点，节点的长度由节点保存的内容决定                                                         |
+| zlend   | uint8_t  | 1    | 特殊值 0xFF （十进制 255），用于标记压缩列表的末端                                                     |
+
+- entry 的结构
+
+  - `<prevlen><encoding><entry-data>`
+  - prevlen：前一节点的长度，占 1 个或 5 个字节
+    - 如果前一节点的长度小于 254 字节，则采用 1 个字节来保存这个长度值
+    - 如果前一节点的长度大于 254 字节，则采用 5 个字节来保存这个长度值，第一个字节为 0xfe，后四个字节才是真实长度数据
+  - encoding：编码属性，记录 entry-data 的数据类型（字符串还是整数）以及长度，占用 1 个、2 个或 5 个字节
+  - entry-data：负责保存节点的数据，可以是字符串或整数
+
+如果 encoding 是以“00”、“01”或者“10”开头，则保存的是字符串。
+
+| 编码                                             | 编码长度    | 字符串大小               |
+|:----------------------------------------------:|:-------:|---------------------|
+| \|00pppppp\|                                     | 1 bytes | <= 63 bytes         |
+| \|01pppppp\|qqqqqqqq\|                            | 2 bytes | <= 16383 bytes      |
+| \|10000000\|qqqqqqqq\|rrrrrrrr\|ssssssss\|tttttttt\| | 5 bytes | <= 4294967295 bytes |
+
+如果 encoding 是以“11”开始，则证明保存的是整数，且 encoding 固定只占用 1 个字节。
+
+| 编码       | 编码长度 | 整数类型                                 |
+|:--------:|:----:|--------------------------------------|
+| 11000000 | 1    | int16_t（2 bytes）                     |
+| 11010000 | 1    | int32_t（4 bytes）                     |
+| 11100000 | 1    | int64_t（8 bytes）                     |
+| 11110000 | 1    | 24 位有符整数 (3 bytes)                     |
+| 11111110 | 1    | 8 位有符整数 (1 bytes)                      |
+| 1111xxxx | 1    | 直接在 xxxx 位置保存数值，范围从 0001~1101，减 1 后结果为实际值 |
+
+- 内存结构示例
+
+```txt
+---------------------------------------------------------------------------
+
+存有字符串 ab 和字符串 bc 的 ziplist 结构如下所示（注：以下十六进制表示省略了 0x 前缀）
+
+---------------------------------------------------------------------------
+   4 bytes       4 bytes    2 bytes    4 bytes       4 bytes   1 byte  
+      |             |          |          |             |         |
+[13 00 00 00] [0e 00 00 00] [02 00] [00 02 61 62] [04 02 62 63] [ff]
+      |             |          |     |   |  |  |   |   |  |  |   |
+　总字节数19       尾偏移14    元素数2  |   |   a  b  |　  |  b  c  终止符
+(4+4+2+4+4)     (4+4+2+4)           |   |      前节点长 |
+                                    |   |             |
+                                前节点长 |      表示长度为2的字符串                  
+                                       |
+                                表示长度为2的字符串
+---------------------------------------------------------------------------
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+---------------------------------------------------------------------------
+
+存有数字 2 和 5 的 ziplist 结构如下所示（注：以下十六进制表示省略了 0x 前缀）
+
+---------------------------------------------------------------------------
+   4 bytes       4 bytes   2 bytes  2 bytes  2 bytes  1 byte  
+      |             |          |       |       |      |
+[0f 00 00 00] [0c 00 00 00] [02 00] [00 f3] [02 f6] [ff]
+      |             |          |     |   |   |   |    |
+  总字节数15      尾偏移12     元素数2  |   |   |    |  终止符
+(4+4+2+2+2+1)   (4+4+2+2)           |   |   |     |
+                                前节点长 |  前节点长 |
+                                       |           |
+                                  编码直接表示2    编码直接表示5
+---------------------------------------------------------------------------
+```
+
+- ziplist的特点
+  - 优点
+    1. 元素在内存中保存为实际大小
+    2. 列表的节点之间不是通过指针连接，而是记录上一节点和本节点长度来寻址，内存占用较低
+  - 缺点
+    1. 如果列表数据过多，导致链表过长，可能影响查询性能
+    2. 增或删较大数据时有可能发生连续更新问题
 
 ### QuickList
 
