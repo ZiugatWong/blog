@@ -1,5 +1,5 @@
 ---
-title: Redis 快速回顾
+title: Redis 速览
 tags:
   - Java
   - Redis
