@@ -152,8 +152,13 @@ theme_config:
     issue_term: pathname
     label: utteranc
     theme: github-dark
+  google_analytics:
+    enabled: true
+    id: 'G-9YS0BYPYLD'
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: ''
+
+
